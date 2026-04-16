@@ -1,13 +1,32 @@
 #!/bin/bash
 set -euo pipefail
 
-function run_ict() {
+function run_sp() {
+    echo "Running unit tests on module code"
+    pytest course/unsupervised_classification/tests/test_unsupervised_core.py
+    echo "Running linter on Introduction to Python"
+    flake8 course/unsupervised_classification/unsupervised_core.py --statistics && echo "No linting errors found in module code"
+    flake8 course/scripts/stage_demo/ --statistics && echo "No linting errors found in stage script"
+    dvc repro stage_demo_report
+}
+
+function run_demo() {
     echo "Running tests for Introduction to Python"
-    pytest course/intro/tests/test_exercises.py
     pytest course/intro/tests/test_pipeline_functions.py
     echo "Running linter on Introduction to Python"
-    flake8 course/intro
-    doit -f dodo_ict_unsupervised.py
+    flake8 course/intro --statistics && echo "No linting errors found in module code"
+    flake8 course/scripts/intro --statistics && echo "No linting errors found in CLI script"
+    echo "Checking for remaining TODOs in scripts"
+    TODO_COUNT=$(grep -ri "TODO" course/scripts/intro | wc -l)
+    if [ "$TODO_COUNT" -gt 0 ]; then
+        echo "Found $TODO_COUNT remaining TODO(s) in your scripts."
+        echo "Make sure you have moved the logic to the module code!"
+        grep -rn "TODO" course/scripts/intro
+    else
+        echo "All TODOs cleared from scripts. Great refactoring!"
+    fi
+    echo "Running demonstration pipeline"
+    dvc repro intro_demo --force --no-commit
 }
 
 function run_hello() {
@@ -34,20 +53,15 @@ function run_cwk() {
     flake8 course/supervised_classification
     flake8 course/unsupervised_classification
     flake8 course/regression
-    echo "Running linter on pipeline files"
-    flake8 *.py
-}
-
-function run_demo() {
-    echo "Running demonstration pipeline"
-    doit -f dodo.py
+    echo "Running linter on scripts"
+    flake8 course/scripts/*/*.py
 }
 
 function run_reports(){
     echo "Running live version of coursework tasks"
-    doit run --single -f dodo_supervised.py
-    doit run --single -f dodo_unsupervised.py
-    doit run --single -f dodo_regression.py
+    dvc repro unsupervised_report
+    dvc repro supervised_report
+    dvc repro regression_report
 }
 
 function show_help() {
@@ -58,7 +72,7 @@ function show_help() {
     echo "  hello        Display greeting message"
     echo "  demo         Run demonstration pipeline"
     echo "  ex           Run exercises"
-    echo "  ict          Run ICT pipeline"
+    echo "  sp           Run staged pipeline"
     echo "  cwk          Run tests and lint on coursework tasks"
     echo "  reports      Run live coursework tasks (needs database connection). Run in Anaconda prompt"
     echo "  help, --help Show this help message"
@@ -67,8 +81,9 @@ function show_help() {
     echo "  $0 demo"
 }
 
-case "$1" in
-    help)
+
+case "${1:-help}" in
+    help|--help|-h)
         show_help
         ;;
     check)
@@ -80,21 +95,21 @@ case "$1" in
     ex)
         run_ex
         ;;
-    ict)
-        run_ict
+    sp)
+        run_sp
         ;;
     cwk)
         run_cwk
         ;;
     demo)
-      run_demo
-      ;;
+        run_demo
+        ;;
     reports)
-      run_reports
-      ;;
+        run_reports
+        ;;
     *)
-        echo "Usage: $0 {check|ict|cwk|demo|reports|hello|help|ex}"
+        echo "Error: Unknown command '$1'"
+        echo "Run '$0 help' to see available commands."
         exit 1
         ;;
-
 esac

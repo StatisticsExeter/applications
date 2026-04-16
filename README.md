@@ -2,68 +2,119 @@
 
 ![CI](https://github.com/<YOUR USER NAME>/<YOUR REPOSITORY NAME>/actions/workflows/main.yml/badge.svg)
 
-This is a template for course MTHM503 "Applications of Data Science and Statistics".  You should fork this repository and use it for your work on this module
+This repository contains the materials for the course **MTHM503: Applications of Data Science and Statistics**.
 
-Note: in a professional setting, a DevOps engineer (or team of engineers) would be responsible for setting up infrastructure like this. You only have to operate within the infrastructure. 
+You will use *your own copy* of this repository (created via GitHub Classroom or by forking) for all assessed and non-assessed work on this module.
+
+> **Note**: In a professional setting, a DevOps engineer (or team of engineers) would be responsible for setting up infrastructure like this.
+> In this course, you only need to operate *within* the provided infrastructure.
+
+---
+
+## How you should work in this repository
+
+- You should **always do your development work on the `main` branch**
+- Automated tests and checks run on `main`
+- For **formative feedback**, open a pull request from:
+  - **compare**: `main`
+  - **base**: `feedback`
+
+Do **not** merge feedback pull requests — tutors will comment on them and then close them.
+
+(Full details are given below.)
+
+---
 
 ## Setting up for the first time
 
-I have tested the set up on a University Virtual Machine, a University Laptop, as well as my own Debian machines.  I have checked it on University Lab Machines. It does work, but occasionally Windows can make things difficult.  You really do need to follow all the instructions carefully.  The most important of these is: **Execute the run file in the Anaconda prompt**.
+The recommended development environment for this module is **Visual Studio Code (VS Code)**. More details:  [VS_CODE.md](VS_CODE.md)
 
-- Make sure you first have a GitHub account, and secondly, register this as a student account with GitHub.  More detailed information is given in ELE.
-- Open Rstudio and create a new project under version control, using the GitHub repository you have just set up. There are slightly different instructions if you are doing this on a virtual machine.
-- This is the tricky part. You need to move over to Anaconda Prompt and point the prompt at the repo you have just downloaded.   `cd` changes the directory, but more specific advice is not available as it all depends where you have put the local copy of your repository
-- With Anaconda prompt in your repository folder you can execute `conda env create -f environment.yml`.  This will set up a conda environment on your working PC and will take a few moments. You then need to activate it by issuing the command  `activate python-exercises`
-- Now, you have to restart your Rstudio.  If you can find the `python-exercises` conda environment all is good. If not, you may have to run the `start_repl.R` script which seems to magically set up some paths inside Rstudio. If you need to do this, open the `start_repl.R` script in Rstudio and hit the button for `source script`.
-- The most important thing is, you need to do this in the first week of the course. Not much else will run if we don't get this set up right. You won't be able to submit coursework.
+I have tested the setup on University Virtual Machines, University laptops and lab machines, and personal Linux machines. It *does* work on Windows, but you will need to follow the instructions carefully.
+
+The **single most important instruction** is:
+
+> **Run commands from the command line (Anaconda Prompt / terminal) inside your repository directory.**
+
+Setup steps:
+
+- Make sure you have a GitHub account and that it is registered as a *student account* with GitHub. Further instructions are available in ELE.
+- Open VS Code and clone your repository, or use **File → Open Folder** if you have already cloned it.
+- Open **Anaconda Prompt** (Windows) or a terminal (macOS/Linux) and navigate to the repository directory you just downloaded.
+- From that directory, run:
+  ```sh
+  conda env create -f environment.yml
+  ```
+- Activate the environment:
+  ```sh
+  activate python-exercises
+  ```
+- In VS Code, select this environment as your Python interpreter when prompted.
+
+⚠️ You need to complete this setup in **Week 1**. Many things will not run correctly until it is done, and you will not be able to submit coursework otherwise.
+
+---
 
 ## Developing reproducible pipelines
 
-The basic method of working is to write functions that pass unit tests.  As you progress, and especially if you want a higher mark, you will want to write your own unit tests and extend the pipelines.  We will look at that in due course.  In the meantime, do note:
+The core working method in this module is:
 
-1. The `REPL` (you can launch this anytime you want by sourcing the `start_repl.R` script) is an interactive python "shell". You can type commands in there e.g. `2 + 2` and view the result.  
-2. You can also write pieces of code in a script file and `run` them in Python by (a) highlighting a region and clicking Ctrl + Enter () or (b) just pressing Ctrl + Enter to submit the cursor line.  If you don't have a python REPL open at this point, Rstudio will open one for you.
-3. You can therefore "experiment" with pieces of code, see how they work line by line and so on. When you are ready, you can wrap these into a function.
-4. The `doit` pipeline tool writes all intermediate stages out as files. You can therefore read in any of these as you see fit and work with it interactively, until you are ready to write a function.
+> Write functions that pass unit tests, and integrate them into reproducible data pipelines.
 
+Key points:
 
+1. You can work **interactively in Python** using VS Code (Python Interactive Window, terminal REPL, or notebooks).
+2. You can also run Python scripts directly from the command line.
+3. Use interactive experimentation to develop ideas, then convert them into functions and scripts.
+4. Reproducible pipelines are managed using **DVC**. You will typically reproduce pipeline stages using:
+   ```sh
+   dvc repro
+   ```
 
-## Formative feedback
+All intermediate data products are tracked and managed by DVC, allowing pipelines to be re-run reliably and inspected at any stage.
 
-To submit your work for formative feedback, you'll use a Pull Request (PR) on GitHub. This allows you to share your code and analysis while giving instructors visibility for feedback and review.
+As the course progresses, you are encouraged — especially for higher marks — to write **your own tests** and extend the pipelines.
 
+---
 
-### Notes
+## Formative feedback (pull requests)
 
-- Don’t create a PR within your own repo—PRs must be opened against this repository for instructors to see them.
+Formative feedback is given via **pull requests against the `feedback` branch**.
 
-- You can update your PR later by pushing additional commits to your branch.
+### How to request feedback
 
-- If you’re unsure which template to use, ask or consult the assignment brief.
+1. Do all your work on `main`
+2. When you want feedback:
+   - Open a pull request
+   - **Base branch**: `feedback`
+   - **Compare branch**: `main`
+3. Select the appropriate pull request template (classification, regression, reporting, etc.)
+
+Tutors will leave comments on the pull request and then **close it**.
+
+> **Do not merge feedback pull requests.** They exist only to support written feedback and discussion.
 
 ```
-        +------------------------+
-        | 1. Initiate the Repo   |  ←-- Student clicks "Fork"
-        +------------------------+
-                  |
-                  v
-        +--------------------+
-        | 2. Do the Work     |  ←-- Edit files, commit code, write report
-        +--------------------+
-                  |
-                  v
         +----------------------------+
-        | 3. Open Pull Request       |
-        |    - Against original repo |
-        |    - Choose correct PR     |
-        |      template              |
-        | (classification, etc.)     |
+        | 1. Get your repository    |
+        |    (GitHub Classroom)     |
         +----------------------------+
-                  |
-                  v
-        +--------------------+
-        | 4. Instructors See |
-        |    and Review PR   |  ←-- Feedback, comments!
-        +--------------------+
-
+                   |
+                   v
+        +----------------------------+
+        | 2. Do the work on `main`  |
+        +----------------------------+
+                   |
+                   v
+        +----------------------------+
+        | 3. Open pull request      |
+        |    main → feedback        |
+        |    Select correct         |
+        |    PR template            |
+        +----------------------------+
+                   |
+                   v
+        +----------------------------+
+        | 4. Tutors review          |
+        |    and comment            |
+        +----------------------------+
 ```

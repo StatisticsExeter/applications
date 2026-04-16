@@ -1,48 +1,51 @@
 def sum_list(numbers):
     """Return the sum of all elements in the list 'numbers'."""
-    return 0
-
+    pass
 
 def first_of_tuple(t):
-    """Return the first element of the tuple 't'."""
-    return 0
+    """Access the element at the first index of the tuple 't'."""
+    pass
 
 
 def has_key(d, key):
     """Return True if 'key' exists in dictionary 'd', else False."""
-    return 0
+    pass
 
 
 def round_float(f):
-    """Round the float 'f' to 2 decimal places."""
-    return 0
+    """Use the built-in rounding function to limit the float 'f' to two decimal places."""
+     pass
 
 
 def reverse_list(lst):
-    """Return a new list that is the reverse of 'lst'."""
-    return 0
+    """Return a new list that is the reverse of 'lst'.  Return a new list.
+    Do not modify the original list in place"""
+    pass
 
 
 def count_occurrences(lst, item):
     """For a list of items 'lst', count how many times element 'item' occurs."""
-    return 0
+     pass
 
 
 def tuples_to_dict(pairs):
-    """Convert a list of (key, value) tuples 'pairs' into a dictionary."""
-    return 0
+    """Convert a list of (key, value) tuples 'pairs' into a dictionary.
+    Use a built-in constructor."""
+    pass
 
 
 def string_length(s):
     """Return the number of characters in string 's'."""
-    return 0
+    pass
 
 
 def unique_elements(lst):
-    """Return a list of unique elements from 'lst'."""
-    return 0
+    """Use a set to remove duplicates, then convert the result back into a list 'lst'."""
+    pass
 
 
 def swap_dict(d):
-    """Return a new dictionary with keys and values of 'd' swapped."""
-    return 0
+    """Return a new dictionary with keys and values of 'd' swapped.
+    Use a dictionary comprehension to map the original values to keys and
+    original keys to values."""
+    pass

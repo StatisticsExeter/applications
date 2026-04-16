@@ -50,6 +50,13 @@ def test_reverse_list(lst, expected):
     assert reverse_list(lst) == expected
 
 
+def test_reverse_list_is_not_inplace():
+    original = [1, 2, 3]
+    result = reverse_list(original)
+    assert result == [3, 2, 1]
+    assert original == [1, 2, 3], "The original list should not be modified!"
+
+
 @pytest.mark.parametrize("lst, item, expected", [
     (['a', 'b', 'a'], 'a', 2),
     ([1, 2, 3, 1], 1, 2),

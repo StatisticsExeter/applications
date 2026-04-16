@@ -1,7 +1,19 @@
+*~
+\#*\#
+vignettes/*
 vignettes/supervised_classification/cache
 vignettes/supervised_classification/*.html
 course/intro/cache/
 .github/workflows/ci_report.zip
+artefacts/*
+
+# DVC internals
+.dvc/cache
+.dvc/tmp
+
+# The "state" file - ignore this so students don't 
+# get merge conflicts after running dvc repro
+dvc.lock
 
 # History files
 .Rhistory
@@ -48,6 +60,8 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+.Renviron.*
+*.Renviron
 
 # pkgdown site
 docs/
@@ -189,3 +203,4 @@ cache/*
 
 */ci_report.zip
 
+/final_report.md

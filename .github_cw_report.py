@@ -12,8 +12,6 @@ commit_sha = os.environ.get("GITHUB_SHA", "unknown")
 source_file = "course/intro/python_exercises.py"
 test_intro_output = "intro_tests_output.txt"
 linter_output = "intro_flake8_output.txt"
-doit_output = "intro_pipeline_output.txt"
-
 
 regression_tests_output = "regression_tests_output.txt"
 supervised_tests_output = "supervised_tests_output.txt"
@@ -21,7 +19,7 @@ unsupervised_tests_output = "unsupervised_tests_output.txt"
 regression_flake8_output = "regression_flake8_output.txt"
 supervised_flake8_output = "supervised_flake8_output.txt"
 unsupervised_flake8_output = "unsupervised_flake8_output.txt"
-dodo_flake8_output = "dodo_flake8_output.txt"
+script_flake8_output = "script_flake8_output.txt"
 
 
 def compute_checksum(filepath):
@@ -43,7 +41,7 @@ checksum = compute_checksum(source_file)
 date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 intro_tests = read_file(test_intro_output)
 linter = read_file(linter_output)
-doit = read_file(doit_output)
+
 
 regression_tests = read_file(regression_tests_output)
 supervised_tests = read_file(supervised_tests_output)
@@ -51,7 +49,7 @@ unsupervised_tests = read_file(unsupervised_tests_output)
 regression_flake8 = read_file(regression_flake8_output)
 supervised_flake8 = read_file(supervised_flake8_output)
 unsupervised_flake8 = read_file(unsupervised_flake8_output)
-dodo_flake8_output = read_file(dodo_flake8_output)
+script_flake8_output = read_file(script_flake8_output)
 
 
 report = f"""
@@ -75,8 +73,7 @@ Checksum of {source_file}:
 --- Flake8 Linter Output ---
 {linter}
 
----Doit pipeline Outout
-{doit}
+
 
 
 ---Coursework checking---
@@ -86,7 +83,7 @@ Checksum of {source_file}:
 {regression_flake8}
 {supervised_flake8}
 {unsupervised_flake8}
-{dodo_flake8_output}
+{script_flake8_output}
 
 
 """

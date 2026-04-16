@@ -5,7 +5,7 @@ import psycopg2
 import pandas as pd
 import sys
 import textwrap
-from doit.exceptions import TaskFailed
+#from doit.exceptions import TaskFailed
 
 
 def warn_if_in_rstudio():
@@ -28,16 +28,16 @@ def warn_if_in_rstudio():
         print(msg, file=sys.stderr)
 
 
-def check_input_file(path, hint=None):
-    """Return a TaskFailed object (not raise it) if the input file is missing."""
-    if not os.path.exists(path):
-        msg = f"Missing required input file: {path}"
-        if hint:
-            msg += f"\n Hint: {hint}"
-        # Return TaskFailed so doit interprets it as a controlled failure
-        print(msg, file=sys.stderr, flush=True)
-        return TaskFailed(msg)
-    return True
+# def check_input_file(path, hint=None):
+#     """Return a TaskFailed object (not raise it) if the input file is missing."""
+#     if not os.path.exists(path):
+#         msg = f"Missing required input file: {path}"
+#         if hint:
+#             msg += f"\n Hint: {hint}"
+#         # Return TaskFailed so doit interprets it as a controlled failure
+#         print(msg, file=sys.stderr, flush=True)
+#         return TaskFailed(msg)
+#     return True
 
 
 def load_pg_data(query):
@@ -82,3 +82,30 @@ def fetch_pg_data(conn, query):
         rows = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
     return pd.DataFrame(rows, columns=colnames)
+
+
+def prepare_collision_data(query_text):
+    """
+    Instructions:
+    1. Load raw data from PostgreSQL using the provided query.
+    2. Set the 'local_authority_ons_district' column as the DataFrame index.
+    3. Convert the denominator (column 0) and numerator columns (columns 1-6) 
+       to float to ensure precise division.
+    4. Normalize the numerator columns by dividing them by the denominator column 
+       (the 'total' or 'population' value).
+    5. Return the processed DataFrame containing the normalized rates.
+
+    Parameters:
+    query_text (str): SQL query to fetch raw collision and population data.
+
+    Returns:
+    pd.DataFrame: A DataFrame where columns 1-6 represent normalized rates.
+    """
+    df = load_pg_data(query_text)
+    df.set_index("local_authority_ons_district", inplace=True)
+    # Convert and normalize
+    df[df.columns[1:7]] = df[df.columns[1:7]].astype(float)
+    df[df.columns[0]] = df[df.columns[0]].astype(float)
+    df.iloc[:, 1:7] = df.iloc[:, 1:7].div(df.iloc[:, 0], axis=0)
+    df_clustering = df.iloc[:, 1:]
+    return df, df_clustering

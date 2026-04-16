@@ -27,6 +27,7 @@ let
       postgresql
       pandoc
       texliveFull
+      quarto
       emacs
       R;
 
