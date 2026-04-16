@@ -31,6 +31,7 @@ jobs:
         continue-on-error: true
         id: intro_test
         run: |
+          set -o pipefail
           conda run -n python-exercises pytest course/intro/tests --ignore=intro/tests/test_db_connection.py | tee intro_tests_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
@@ -38,14 +39,16 @@ jobs:
         continue-on-error: true
         id: intro_lint
         run: |
-          conda run -n python-exercises flake8 course/intro --exit-zero | tee intro_flake8_output.txt
+          set -o pipefail
+          conda run -n python-exercises flake8 course/intro | tee intro_flake8_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       - name: Run pipeline for intro
         continue-on-error: true
         id: intro_dvc_demo
         run: |
-          conda run -n python-exercises dvc repro intro_demo --exit-zero | tee intro_dvc_demo_output.txt
+          set -o pipefail
+          conda run -n python-exercises dvc repro intro_demo | tee intro_dvc_demo_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       # --- REGRESSION ---
@@ -53,6 +56,7 @@ jobs:
         continue-on-error: true
         id: reg_test
         run: |
+          set -o pipefail
           conda run -n python-exercises pytest course/regression | tee regression_tests_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
@@ -60,7 +64,8 @@ jobs:
         continue-on-error: true
         id: reg_lint
         run: |
-          conda run -n python-exercises flake8 course/regression --exit-zero | tee regression_flake8_output.txt
+          set -o pipefail
+          conda run -n python-exercises flake8 course/regression | tee regression_flake8_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       # --- SUPERVISED ---
@@ -68,6 +73,7 @@ jobs:
         continue-on-error: true
         id: sup_test
         run: |
+          set -o pipefail
           conda run -n python-exercises pytest course/supervised_classification | tee supervised_tests_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
@@ -75,7 +81,8 @@ jobs:
         continue-on-error: true
         id: sup_lint
         run: |
-          conda run -n python-exercises flake8 course/supervised_classification --exit-zero | tee supervised_flake8_output.txt
+          set -o pipefail
+          conda run -n python-exercises flake8 course/supervised_classification | tee supervised_flake8_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       # --- UNSUPERVISED ---
@@ -83,6 +90,7 @@ jobs:
         continue-on-error: true
         id: unsup_test
         run: |
+          set -o pipefail
           conda run -n python-exercises pytest course/unsupervised_classification | tee unsupervised_tests_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
@@ -90,14 +98,16 @@ jobs:
         continue-on-error: true
         id: unsup_lint
         run: |
-          conda run -n python-exercises flake8 course/unsupervised_classification --exit-zero | tee unsupervised_flake8_output.txt
+          set -o pipefail
+          conda run -n python-exercises flake8 course/unsupervised_classification | tee unsupervised_flake8_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
       - name: Run flake8 for scripts
         continue-on-error: true
         id: scripts
         run: |
-          conda run -n python-exercises flake8 course/scripts/*/*.py --exit-zero | tee script_flake8_output.txt
+          set -o pipefail
+          conda run -n python-exercises flake8 course/scripts/*/*.py | tee script_flake8_output.txt
           echo "exit_code=$?" >> $GITHUB_OUTPUT
 
           
@@ -149,11 +159,15 @@ jobs:
           # This step actually fails the build if any status was non-zero 
           # so they still get a 'Red X' on the commit, but only at the very end.
           if [[ "${{ steps.intro_test.outputs.exit_code }}" != "0" || \
+                "${{ steps.intro_lint.outputs.exit_code }}" != "0" || \
                 "${{ steps.reg_test.outputs.exit_code }}" != "0" || \
+                "${{ steps.reg_lint.outputs.exit_code }}" != "0" || \
                 "${{ steps.sup_test.outputs.exit_code }}" != "0" || \
+                "${{ steps.sup_lint.outputs.exit_code }}" != "0" || \
                 "${{ steps.unsup_test.outputs.exit_code }}" != "0" || \
+                "${{ steps.unsup_lint.outputs.exit_code }}" != "0" || \
                 "${{ steps.scripts.outputs.exit_code }}" != "0" ]]; then
-            echo "One or more tests failed. Please see your pdf for details"
+                 echo "One or more tests failed. Please see your pdf for details"
             exit 1
           fi
   
