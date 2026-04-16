@@ -1,0 +1,10 @@
+mode: lab
+lab:
+  unsupervised_title: "Scatter Plot of Crash Types by Local Authority"
+  supervised_title: "Housing age by energy status"
+  regression_title: "Predicting energy usege by house type"
+
+cw:
+  unsupervised_title: "Final Coursework Project"
+  supervised_title: "Final Coursework Project"
+  regression_title: "Final Coursework Project"

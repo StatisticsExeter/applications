@@ -1,0 +1,341 @@
+vars:
+      - params.yaml
+stages:
+  intro_demo:
+    cmd: >
+      python course/scripts/intro/01_pipeline_demo.py
+      --out-dir artefacts/intro
+      --template reports/templates/intro.md
+    deps:
+      - course/scripts/intro/01_pipeline_demo.py
+      - course/intro/pipeline_functions.py
+      - reports/templates/intro.md
+    outs:
+      - artefacts/intro/filtered_data.csv
+      - artefacts/intro/correlation.txt
+      - artefacts/intro/regression_summary.txt
+      - artefacts/intro/scatterplot.png
+      - reports/intro.html
+  stage_demo_load:
+    cmd: >
+      python course/scripts/stage_demo/01_load_process.py
+      --input-csv data/olive_oil.csv
+      --processed-csv artefacts/stage_demo/lab_olive_oil.csv
+    deps:
+      - course/scripts/stage_demo/01_load_process.py
+      - data/olive_oil.csv
+    outs:
+      - artefacts/stage_demo/lab_olive_oil.csv
+  stage_demo_eda:
+    cmd: >
+      python course/scripts/stage_demo/02_eda.py
+      --input-csv artefacts/stage_demo/lab_olive_oil.csv
+      --output-dir artefacts/stage_demo
+    deps:
+      - course/scripts/stage_demo/02_eda.py
+      - artefacts/stage_demo/lab_olive_oil.csv
+      - course/unsupervised_classification/unsupervised_core.py
+    outs:
+      - artefacts/stage_demo/lab_olive_oil_summary.txt
+      - artefacts/stage_demo/lab_olive_oil_raw_boxplot.jpg
+      - artefacts/stage_demo/lab_olive_oil_scaled_boxplot.jpg
+      - artefacts/stage_demo/lab_olive_oil_scatterplot.jpg
+  stage_demo_train:
+    cmd: >
+      python course/scripts/stage_demo/03_train_model.py
+      --input-csv artefacts/stage_demo/lab_olive_oil.csv
+      --out-dir artefacts/stage_demo/
+    deps:
+      - course/scripts/stage_demo/03_train_model.py
+      - course/unsupervised_classification/unsupervised_core.py
+      - artefacts/stage_demo/lab_olive_oil.csv
+    outs:
+      - artefacts/stage_demo/dendrogram.jpg
+      - artefacts/stage_demo/kmeans_1.jpg
+      - artefacts/stage_demo/kmeans_2.jpg
+      - artefacts/stage_demo/kmeans_scatter.jpg
+  stage_demo_report:
+    cmd: >
+      python course/scripts/stage_demo/04_report.py
+      --template-md reports/templates/stage_demo.md
+      --summary-txt artefacts/stage_demo/lab_olive_oil_summary.txt
+      --output-html reports/stage_demo.html
+    deps:
+      - course/scripts/stage_demo/04_report.py
+      - reports/templates/stage_demo.md
+      - artefacts/stage_demo/lab_olive_oil_summary.txt
+      - artefacts/stage_demo/dendrogram.jpg
+      - artefacts/stage_demo/kmeans_1.jpg
+      - artefacts/stage_demo/kmeans_2.jpg
+      - artefacts/stage_demo/kmeans_scatter.jpg
+    outs:
+      - reports/stage_demo.html
+  # coursework 1
+  unsupervised_load:
+    cmd: >
+      python course/scripts/unsupervised/01_load_data_${mode}.py
+      --sql-file sql/unsupervised_${mode}.sql
+      --output-csv artefacts/unsupervised/${mode}/data.csv
+    deps:
+      - sql/unsupervised_${mode}.sql
+      - course/scripts/unsupervised/01_load_data_${mode}.py
+    outs:
+      - artefacts/unsupervised/${mode}/data.csv
+
+  unsupervised_eda:
+    cmd: >
+      python course/scripts/unsupervised/02_eda.py
+      --input-csv artefacts/unsupervised/${mode}/data.csv
+      --out-path artefacts/unsupervised/${mode}
+      --title ${mode}.unsupervised_title
+    deps:
+      - artefacts/unsupervised/${mode}/data.csv
+      - course/scripts/unsupervised/02_eda.py
+      - course/unsupervised_classification/unsupervised_core.py
+    outs:
+      - artefacts/unsupervised/${mode}/scatterplot.jpg
+
+  unsupervised_train:
+    cmd: >
+      python course/scripts/unsupervised/03_cluster.py
+      --input-csv artefacts/unsupervised/${mode}/data.csv
+      --out-dir artefacts/unsupervised/${mode}
+      --height 10
+      --k 4
+    deps:
+      - artefacts/unsupervised/${mode}/data.csv
+      - course/scripts/unsupervised/03_cluster.py
+      - course/unsupervised_classification/unsupervised_core.py
+    outs:
+      - artefacts/unsupervised/${mode}/dendrogram.jpg
+      - artefacts/unsupervised/${mode}/hcluster_scatter.jpg
+      - artefacts/unsupervised/${mode}/kmeans_1.jpg
+      - artefacts/unsupervised/${mode}/kmeans_2.jpg
+      - artefacts/unsupervised/${mode}/kmeans_scatter.jpg
+
+  unsupervised_report:
+    cmd: >
+      python course/scripts/unsupervised/04_report.py
+      --input-md reports/templates/${mode}_unsupervised.md
+      --output-html reports/${mode}_unsupervised_report.html
+    deps:
+      - course/scripts/unsupervised/04_report.py
+      - reports/templates/lab_unsupervised.md
+      - artefacts/unsupervised/${mode}/dendrogram.jpg
+      - artefacts/unsupervised/${mode}/hcluster_scatter.jpg
+      - artefacts/unsupervised/${mode}/kmeans_1.jpg
+      - artefacts/unsupervised/${mode}/kmeans_2.jpg
+      - artefacts/unsupervised/${mode}/kmeans_scatter.jpg
+    outs:
+      - reports/${mode}_unsupervised_report.html
+
+  supervised_load:
+    cmd: >
+      python course/scripts/supervised/01_load_data_${mode}.py
+      --sql-file sql/supervised_${mode}.sql
+      --outfile artefacts/supervised/${mode}/data.csv
+    deps:
+      - sql/supervised_${mode}.sql
+      - course/scripts/supervised/01_load_data_${mode}.py
+    outs:
+      - artefacts/supervised/${mode}/data.csv
+
+  supervised_split:
+    cmd: >
+      python course/scripts/supervised/02_split.py
+      --input-csv artefacts/supervised/${mode}/data.csv
+      --x-train-out artefacts/supervised/${mode}/x_train.csv
+      --y-train-out artefacts/supervised/${mode}/y_train.csv
+      --x-test-out artefacts/supervised/${mode}/x_test.csv
+      --y-test-out artefacts/supervised/${mode}/y_test.csv
+    deps:
+      - artefacts/supervised/${mode}/data.csv
+      - course/scripts/supervised/02_split.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/x_train.csv
+      - artefacts/supervised/${mode}/y_train.csv
+      - artefacts/supervised/${mode}/x_test.csv
+      - artefacts/supervised/${mode}/y_test.csv
+
+  supervised_train_lda:
+    cmd: >
+      python course/scripts/supervised/03_classify.py train
+      --x-train artefacts/supervised/${mode}/x_train.csv
+      --y-train artefacts/supervised/${mode}/y_train.csv
+      --model-type lda
+      --model-out artefacts/supervised/${mode}/lda_model.joblib
+    deps:
+      - artefacts/supervised/${mode}/x_train.csv
+      - artefacts/supervised/${mode}/y_train.csv
+      - course/scripts/supervised/03_classify.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/lda_model.joblib
+
+  supervised_predict_lda:
+    cmd: >
+      python course/scripts/supervised/03_classify.py predict
+      --x-test artefacts/supervised/${mode}/x_test.csv
+      --model-in artefacts/supervised/${mode}/lda_model.joblib
+      --pred-out artefacts/supervised/${mode}/lda_y_pred.csv
+      --prob-out artefacts/supervised/${mode}/lda_y_pred_prob.csv
+    deps:
+      - artefacts/supervised/${mode}/x_test.csv
+      - artefacts/supervised/${mode}/lda_model.joblib
+      - course/scripts/supervised/03_classify.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/lda_y_pred.csv
+      - artefacts/supervised/${mode}/lda_y_pred_prob.csv
+
+  supervised_train_qda:
+    cmd: >
+      python course/scripts/supervised/03_classify.py train
+      --x-train artefacts/supervised/${mode}/x_train.csv
+      --y-train artefacts/supervised/${mode}/y_train.csv
+      --model-type qda
+      --model-out artefacts/supervised/${mode}/qda_model.joblib
+    deps:
+      - artefacts/supervised/${mode}/x_train.csv
+      - artefacts/supervised/${mode}/y_train.csv
+      - course/scripts/supervised/03_classify.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/qda_model.joblib
+
+  supervised_predict_qda:
+    cmd: >
+      python course/scripts/supervised/03_classify.py predict
+      --x-test artefacts/supervised/${mode}/x_test.csv
+      --model-in artefacts/supervised/${mode}/qda_model.joblib
+      --pred-out artefacts/supervised/${mode}/qda_y_pred.csv
+      --prob-out artefacts/supervised/${mode}/qda_y_pred_prob.csv
+    deps:
+      - artefacts/supervised/${mode}/x_test.csv
+      - artefacts/supervised/${mode}/qda_model.joblib
+      - course/scripts/supervised/03_classify.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/qda_y_pred.csv
+      - artefacts/supervised/${mode}/qda_y_pred_prob.csv
+
+  supervised_evaluate_lda:
+    cmd: >
+      python course/scripts/supervised/04_evaluate.py 
+      --y-test-csv artefacts/supervised/${mode}/y_test.csv 
+      --classifier-pred-csv artefacts/supervised/${mode}/lda_y_pred.csv 
+      --classifier-prob-csv artefacts/supervised/${mode}/lda_y_pred_prob.csv 
+      --classifier-report-out artefacts/supervised/${mode}/lda_report.csv 
+      --roc-plot-out artefacts/supervised/${mode}/lda_roc.jpg
+    deps:
+      - artefacts/supervised/${mode}/y_test.csv 
+      - artefacts/supervised/${mode}/lda_y_pred.csv 
+      - artefacts/supervised/${mode}/lda_y_pred_prob.csv 
+      - course/scripts/supervised/04_evaluate.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/lda_report.csv
+      - artefacts/supervised/${mode}/lda_roc.jpg
+  supervised_evaluate_qda:
+    cmd: >
+      python course/scripts/supervised/04_evaluate.py 
+      --y-test-csv artefacts/supervised/${mode}/y_test.csv 
+      --classifier-pred-csv artefacts/supervised/${mode}/qda_y_pred.csv 
+      --classifier-prob-csv artefacts/supervised/${mode}/qda_y_pred_prob.csv 
+      --classifier-report-out artefacts/supervised/${mode}/qda_report.csv 
+      --roc-plot-out artefacts/supervised/${mode}/qda_roc.jpg
+    deps:
+      - artefacts/supervised/${mode}/y_test.csv 
+      - artefacts/supervised/${mode}/qda_y_pred.csv 
+      - artefacts/supervised/${mode}/qda_y_pred_prob.csv 
+      - course/scripts/supervised/04_evaluate.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/qda_report.csv
+      - artefacts/supervised/${mode}/qda_roc.jpg
+  supervised_report_prep:
+    cmd: >
+      python course/scripts/supervised/05_report.py 
+      --template reports/templates/${mode}_supervised.md
+      --lda-csv artefacts/supervised/${mode}/lda_report.csv
+      --qda-csv artefacts/supervised/${mode}/qda_report.csv
+      --output artefacts/supervised/${mode}/supervised_complete.md
+    deps:
+      - reports/templates/${mode}_supervised.md
+      - artefacts/supervised/${mode}/lda_report.csv
+      - artefacts/supervised/${mode}/qda_report.csv
+      - course/scripts/supervised/05_report.py
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/supervised/${mode}/supervised_complete.md
+
+  supervised_report:
+    cmd: >
+      pandoc artefacts/supervised/${mode}/supervised_complete.md
+      -o reports/${mode}_supervised_report.html
+      --resource-path=.
+      --self-contained
+    deps:
+      - artefacts/supervised/${mode}/supervised_complete.md
+      - artefacts/supervised/${mode}/lda_roc.jpg
+      - artefacts/supervised/${mode}/qda_roc.jpg
+    outs:
+      - reports/${mode}_supervised_report.html      
+
+  regression_load:
+    cmd: >
+      python course/scripts/regression/01_load_data_${mode}.py
+      --sql-file sql/regression_${mode}.sql
+      --outfile artefacts/regression/${mode}/data.csv
+    deps:
+      - sql/regression_${mode}.sql
+      - course/scripts/regression/01_load_data_${mode}.py
+    outs:
+      - artefacts/regression/${mode}/data.csv
+  regression_train:
+    cmd: >
+      python course/scripts/regression/03_fit_regression.py
+      --input-csv artefacts/regression/${mode}/data.csv
+      --formula "shortfall ~ n_rooms + age"
+      --group-col "local_authority_code"
+      --summary-out artefacts/regression/${mode}/model_summary.txt
+      --re-csv-out artefacts/regression/${mode}/random_effects.csv
+      --model-out artefacts/regression/${mode}/mixed_model.joblib
+    deps:
+      - course/scripts/regression/03_fit_regression.py
+      - artefacts/regression/${mode}/data.csv
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/regression/${mode}/model_summary.txt
+      - artefacts/regression/${mode}/random_effects.csv
+      - artefacts/regression/${mode}/mixed_model.joblib        
+  regression_evaluate:
+    cmd: >
+      python course/scripts/regression/04_regression_results.py
+      --model-in artefacts/regression/${mode}/mixed_model.joblib
+      --re-csv-in artefacts/regression/${mode}/random_effects.csv
+      --caterpillar-out artefacts/regression/${mode}/caterpillar.png
+      --resid-out artefacts/regression/${mode}/residuals.png
+    deps:
+      - course/scripts/regression/04_regression_results.py
+      - artefacts/regression/${mode}/mixed_model.joblib
+      - artefacts/regression/${mode}/random_effects.csv
+      - course/supervised_classification/supervised_core.py
+    outs:
+      - artefacts/regression/${mode}/caterpillar.png
+      - artefacts/regression/${mode}/residuals.png
+  regression_report:
+    cmd: >
+      python course/scripts/regression/05_report.py
+      --template-md reports/templates/${mode}_regression.md
+      --summary-txt artefacts/regression/${mode}/model_summary.txt
+      --output-html reports/${mode}_regression_report.html
+    deps:
+      - course/scripts/regression/05_report.py
+      - reports/templates/${mode}_regression.md
+      - artefacts/regression/${mode}/model_summary.txt
+      - artefacts/regression/${mode}/caterpillar.png
+      - artefacts/regression/${mode}/residuals.png
+    outs:
+      - reports/${mode}_regression_report.html
