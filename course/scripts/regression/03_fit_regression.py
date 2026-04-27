@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import sys
 import joblib
+import re
 # The next few lines ensure that the project root is in the Python path,
 # allowing us to import modules from the project.
 script_path = Path(__file__).resolve()
@@ -24,7 +25,8 @@ from course.regression.regression_core import (  # noqa: E402
 def main(input_csv, formula, group_col, summary_out, re_csv_out, model_out):
     df = pd.read_csv(input_csv)
     input_rows = len(df)
-    model_cols = ["shortfall", "n_rooms", "age", group_col]
+    formula_vars = re.findall(r'\b\w+\b', formula)
+    model_cols = list(set(formula_vars + [group_col]))
     df = df.dropna(subset=model_cols).copy()
     df[group_col] = df[group_col].astype(str)
     df = df.reset_index(drop=True)

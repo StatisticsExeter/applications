@@ -13,13 +13,14 @@ from course.supervised_classification.supervised_core import perform_split  # no
 
 @click.command()
 @click.option('--input-csv', type=click.Path(exists=True))
+@click.option('--target-var', type=str, required=True, help="Column name to use as target (y)")
 @click.option('--x-train-out', type=click.Path())
 @click.option('--x-test-out', type=click.Path())
 @click.option('--y-train-out', type=click.Path())
 @click.option('--y-test-out', type=click.Path())
-def main(input_csv, x_train_out, x_test_out, y_train_out, y_test_out):
+def main(input_csv, target_var, x_train_out, x_test_out, y_train_out, y_test_out):
     df = pd.read_csv(input_csv)
-    X_train, X_test, y_train, y_test = perform_split(df)
+    X_train, X_test, y_train, y_test = perform_split(df, target_var)
     X_train.to_csv(x_train_out, index=False)
     X_test.to_csv(x_test_out, index=False)
     y_train.to_csv(y_train_out, index=False)

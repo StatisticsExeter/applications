@@ -120,7 +120,7 @@ stages:
       --output-html reports/${mode}_unsupervised_report.html
     deps:
       - course/scripts/unsupervised/04_report.py
-      - reports/templates/lab_unsupervised.md
+      - reports/templates/${mode}_unsupervised.md
       - artefacts/unsupervised/${mode}/dendrogram.jpg
       - artefacts/unsupervised/${mode}/hcluster_scatter.jpg
       - artefacts/unsupervised/${mode}/kmeans_1.jpg
@@ -144,6 +144,7 @@ stages:
     cmd: >
       python course/scripts/supervised/02_split.py
       --input-csv artefacts/supervised/${mode}/data.csv
+      --target-var ${active.supervised_target_variable}
       --x-train-out artefacts/supervised/${mode}/x_train.csv
       --y-train-out artefacts/supervised/${mode}/y_train.csv
       --x-test-out artefacts/supervised/${mode}/x_test.csv
@@ -297,8 +298,8 @@ stages:
     cmd: >
       python course/scripts/regression/03_fit_regression.py
       --input-csv artefacts/regression/${mode}/data.csv
-      --formula "shortfall ~ n_rooms + age"
-      --group-col "local_authority_code"
+      --formula "${active.regression_formula}"
+      --group-col "${active.regression_group}"
       --summary-out artefacts/regression/${mode}/model_summary.txt
       --re-csv-out artefacts/regression/${mode}/random_effects.csv
       --model-out artefacts/regression/${mode}/mixed_model.joblib

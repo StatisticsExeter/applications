@@ -115,25 +115,44 @@ jobs:
       - name: Generate Summary Dashboard
         if: always()
         run: |
-          function get_emoji() {
-            if [ "$1" == "0" ]; then echo "🟢 Pass"; 
-            elif [ "$1" == "" ]; then echo "🔴 Did not run";
-            else echo "🟠 Errors/Failures"; fi
+          function test_emoji() {
+            code="$1"
+            if [ "$code" == "0" ]; then
+              echo "🟢 Pass"
+            elif [ "$code" == "1" ]; then
+              echo "🟠 Test failures"
+            elif [ "$code" == "" ]; then
+              echo "🔴 Did not run"
+            else
+              echo "🔴 Pytest error ($code)"
+            fi
+           }
+ 
+          function lint_emoji() {
+            code="$1"
+            if [ "$code" == "0" ]; then
+              echo "🟢 Pass"
+            elif [ "$code" == "" ]; then
+              echo "🔴 Did not run"
+            else
+              echo "🟠 Issues"
+            fi
           }
 
-          echo "## 📊 Coursework Status Dashboard" >> $GITHUB_STEP_SUMMARY
+
+          echo "## Coursework Status Dashboard" >> $GITHUB_STEP_SUMMARY
           echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
           echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Intro Tests** | $(get_emoji ${{ steps.intro_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Intro Lint** | $(get_emoji ${{ steps.intro_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Intro DVC** | $(get_emoji ${{ steps.intro_dvc_demo.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Regression Tests** | $(get_emoji ${{ steps.reg_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Regression Lint** | $(get_emoji ${{ steps.reg_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Supervised Tests** | $(get_emoji ${{ steps.sup_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Supervised Lint** | $(get_emoji ${{ steps.sup_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Unsupervised Tests** | $(get_emoji ${{ steps.unsup_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Unsupervised Lint** | $(get_emoji ${{ steps.unsup_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Scripts Lint** | $(get_emoji ${{ steps.scripts.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Intro Tests** | $(test_emoji ${{ steps.intro_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Intro Lint** | $(lint_emoji ${{ steps.intro_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Intro DVC** | $(lint_emoji ${{ steps.intro_dvc_demo.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Regression Tests** | $(test_emoji ${{ steps.reg_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Regression Lint** | $(lint_emoji ${{ steps.reg_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Supervised Tests** | $(test_emoji ${{ steps.sup_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Supervised Lint** | $(lint_emoji ${{ steps.sup_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Unsupervised Tests** | $(test_emoji ${{ steps.unsup_test.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Unsupervised Lint** | $(lint_emoji ${{ steps.unsup_lint.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Scripts Lint** | $(lint_emoji ${{ steps.scripts.outputs.exit_code }}) |" >> $GITHUB_STEP_SUMMARY
 
 # --- PDF REPORT GENERATION ---
       # We bring back your collation logic here
@@ -147,7 +166,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: full_coursework_report
+          name: actions_report
           path: |
             ci_report.pdf
             *_output.txt
