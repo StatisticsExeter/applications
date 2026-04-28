@@ -2,6 +2,7 @@ def sum_list(numbers):
     """Return the sum of all elements in the list 'numbers'."""
     pass
 
+
 def first_of_tuple(t):
     """Access the element at the first index of the tuple 't'."""
     pass
@@ -14,7 +15,7 @@ def has_key(d, key):
 
 def round_float(f):
     """Use the built-in rounding function to limit the float 'f' to two decimal places."""
-     pass
+    pass
 
 
 def reverse_list(lst):
@@ -25,7 +26,7 @@ def reverse_list(lst):
 
 def count_occurrences(lst, item):
     """For a list of items 'lst', count how many times element 'item' occurs."""
-     pass
+    pass
 
 
 def tuples_to_dict(pairs):
